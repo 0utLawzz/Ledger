@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Law Firm Ledger API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: clients
+    description: Client management
+  - name: cases
+    description: Case management
+  - name: reports
+    description: Reports and summaries
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +28,228 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List all clients
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [clients]
+      summary: Create a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
+  /clients/{id}:
+    get:
+      operationId: getClient
+      tags: [clients]
+      summary: Get a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Not found
+    put:
+      operationId: updateClient
+      tags: [clients]
+      summary: Update a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+    delete:
+      operationId: deleteClient
+      tags: [clients]
+      summary: Delete a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /cases:
+    get:
+      operationId: listCases
+      tags: [cases]
+      summary: List cases
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+        - name: stage
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Case"
+    post:
+      operationId: createCase
+      tags: [cases]
+      summary: Create a case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+
+  /cases/{id}:
+    get:
+      operationId: getCase
+      tags: [cases]
+      summary: Get a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Case
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+        "404":
+          description: Not found
+    put:
+      operationId: updateCase
+      tags: [cases]
+      summary: Update a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+    delete:
+      operationId: deleteCase
+      tags: [cases]
+      summary: Delete a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /reports/summary:
+    get:
+      operationId: getReportSummary
+      tags: [reports]
+      summary: Overall financial and case summary
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportSummary"
+
+  /reports/client/{id}:
+    get:
+      operationId: getClientReport
+      tags: [reports]
+      summary: Per-client report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Client report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientReport"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +260,174 @@ components:
       required:
         - status
 
+    Client:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ClientInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+
+    ClientUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+
+    Case:
+      type: object
+      required: [id, clientId, caseNo, date, stage, due, received, balance, createdAt]
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        clientName:
+          type: ["string", "null"]
+        caseNo:
+          type: string
+        date:
+          type: string
+        stage:
+          type: integer
+          minimum: 1
+          maximum: 4
+        tmNumber:
+          type: ["string", "null"]
+        detail:
+          type: ["string", "null"]
+        due:
+          type: number
+        received:
+          type: number
+        balance:
+          type: number
+        createdAt:
+          type: string
+
+    CaseInput:
+      type: object
+      required: [clientId, caseNo, date, stage, due, received]
+      properties:
+        clientId:
+          type: integer
+        caseNo:
+          type: string
+          minLength: 1
+        date:
+          type: string
+        stage:
+          type: integer
+          minimum: 1
+          maximum: 4
+        tmNumber:
+          type: string
+        detail:
+          type: string
+        due:
+          type: number
+        received:
+          type: number
+
+    CaseUpdate:
+      type: object
+      properties:
+        clientId:
+          type: integer
+        caseNo:
+          type: string
+        date:
+          type: string
+        stage:
+          type: integer
+          minimum: 1
+          maximum: 4
+        tmNumber:
+          type: string
+        detail:
+          type: string
+        due:
+          type: number
+        received:
+          type: number
+
+    ReportSummary:
+      type: object
+      required: [totalClients, totalCases, totalDue, totalReceived, totalBalance, casesByStage]
+      properties:
+        totalClients:
+          type: integer
+        totalCases:
+          type: integer
+        totalDue:
+          type: number
+        totalReceived:
+          type: number
+        totalBalance:
+          type: number
+        casesByStage:
+          type: array
+          items:
+            $ref: "#/components/schemas/StageCount"
+
+    StageCount:
+      type: object
+      required: [stage, count]
+      properties:
+        stage:
+          type: integer
+        count:
+          type: integer
+
+    ClientReport:
+      type: object
+      required: [client, cases, totalDue, totalReceived, totalBalance]
+      properties:
+        client:
+          $ref: "#/components/schemas/Client"
+        cases:
+          type: array
+          items:
+            $ref: "#/components/schemas/Case"
+        totalDue:
+          type: number
+        totalReceived:
+          type: number
+        totalBalance:
+          type: number
