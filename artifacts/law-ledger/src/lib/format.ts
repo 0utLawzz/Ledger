@@ -1,18 +1,17 @@
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
+  return "PKR " + new Intl.NumberFormat("en-PK", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "";
   try {
-    return new Date(dateStr).toLocaleDateString("en-US", {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
       year: "numeric",
       month: "short",
-      day: "numeric",
+      day: "2-digit",
     });
   } catch {
     return dateStr;
@@ -27,8 +26,8 @@ export const STAGE_LABELS: Record<number, string> = {
 };
 
 export const STAGE_COLORS: Record<number, string> = {
-  1: "bg-blue-100 text-blue-800 border-blue-200",
-  2: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  3: "bg-orange-100 text-orange-800 border-orange-200",
-  4: "bg-green-100 text-green-800 border-green-200",
+  1: "bg-[#DBEAFE] border-[#2563EB] text-[#1e40af]",
+  2: "bg-[#FEF9C3] border-[#CA8A04] text-[#854d0e]",
+  3: "bg-[#FFEDD5] border-[#C94A00] text-[#9a3412]",
+  4: "bg-[#DCFCE7] border-[#16a34a] text-[#14532d]",
 };

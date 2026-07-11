@@ -116,6 +116,29 @@ export interface ClientReport {
   totalBalance: number;
 }
 
+export interface StageRate {
+  id: number;
+  clientId: number;
+  /**
+     * @minimum 1
+     * @maximum 4
+     */
+  stage: number;
+  rate: number;
+  /** @nullable */
+  label?: string | null;
+}
+
+export interface StageRateInput {
+  /**
+     * @minimum 1
+     * @maximum 4
+     */
+  stage: number;
+  rate: number;
+  label?: string;
+}
+
 export type ListCasesParams = {
 /**
  * @nullable

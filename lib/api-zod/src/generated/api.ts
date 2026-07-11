@@ -317,3 +317,56 @@ export const GetClientReportResponse = zod.object({
 })
 
 
+/**
+ * @summary Get stage rates for a client
+ */
+export const GetClientRatesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const getClientRatesResponseStageMax = 4;
+
+
+
+export const GetClientRatesResponseItem = zod.object({
+  "id": zod.number(),
+  "clientId": zod.number(),
+  "stage": zod.number().min(1).max(getClientRatesResponseStageMax),
+  "rate": zod.number(),
+  "label": zod.string().nullish()
+})
+export const GetClientRatesResponse = zod.array(GetClientRatesResponseItem)
+
+
+/**
+ * @summary Set stage rates for a client
+ */
+export const UpdateClientRatesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const updateClientRatesBodyStageMax = 4;
+
+
+
+export const UpdateClientRatesBodyItem = zod.object({
+  "stage": zod.number().min(1).max(updateClientRatesBodyStageMax),
+  "rate": zod.number(),
+  "label": zod.string().optional()
+})
+export const UpdateClientRatesBody = zod.array(UpdateClientRatesBodyItem)
+
+export const updateClientRatesResponseStageMax = 4;
+
+
+
+export const UpdateClientRatesResponseItem = zod.object({
+  "id": zod.number(),
+  "clientId": zod.number(),
+  "stage": zod.number().min(1).max(updateClientRatesResponseStageMax),
+  "rate": zod.number(),
+  "label": zod.string().nullish()
+})
+export const UpdateClientRatesResponse = zod.array(UpdateClientRatesResponseItem)
+
+

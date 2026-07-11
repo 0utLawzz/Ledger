@@ -17,3 +17,5 @@ export * from './healthStatus';
 export * from './listCasesParams';
 export * from './reportSummary';
 export * from './stageCount';
+export * from './stageRate';
+export * from './stageRateInput';

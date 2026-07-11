@@ -29,7 +29,9 @@ import type {
   ClientUpdate,
   HealthStatus,
   ListCasesParams,
-  ReportSummary
+  ReportSummary,
+  StageRate,
+  StageRateInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1032,4 +1034,153 @@ export function useGetClientReport<TData = Awaited<ReturnType<typeof getClientRe
 
 
 
+
+export const getGetClientRatesUrl = (id: number,) => {
+
+
+
+
+  return `/api/clients/${id}/rates`
+}
+
+/**
+ * @summary Get stage rates for a client
+ */
+export const getClientRates = async (id: number, options?: RequestInit): Promise<StageRate[]> => {
+
+  return customFetch<StageRate[]>(getGetClientRatesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetClientRatesQueryKey = (id: number,) => {
+    return [
+    `/api/clients/${id}/rates`
+    ] as const;
+    }
+
+
+export const getGetClientRatesQueryOptions = <TData = Awaited<ReturnType<typeof getClientRates>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getClientRates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetClientRatesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClientRates>>> = ({ signal }) => getClientRates(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClientRates>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetClientRatesQueryResult = NonNullable<Awaited<ReturnType<typeof getClientRates>>>
+export type GetClientRatesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get stage rates for a client
+ */
+
+export function useGetClientRates<TData = Awaited<ReturnType<typeof getClientRates>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getClientRates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetClientRatesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateClientRatesUrl = (id: number,) => {
+
+
+
+
+  return `/api/clients/${id}/rates`
+}
+
+/**
+ * @summary Set stage rates for a client
+ */
+export const updateClientRates = async (id: number,
+    stageRateInput: StageRateInput[], options?: RequestInit): Promise<StageRate[]> => {
+
+  return customFetch<StageRate[]>(getUpdateClientRatesUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(stageRateInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateClientRatesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateClientRates>>, TError,{id: number;data: BodyType<StageRateInput[]>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateClientRates>>, TError,{id: number;data: BodyType<StageRateInput[]>}, TContext> => {
+
+const mutationKey = ['updateClientRates'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateClientRates>>, {id: number;data: BodyType<StageRateInput[]>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateClientRates(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateClientRatesMutationResult = NonNullable<Awaited<ReturnType<typeof updateClientRates>>>
+    export type UpdateClientRatesMutationBody = BodyType<StageRateInput[]>
+    export type UpdateClientRatesMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Set stage rates for a client
+ */
+export const useUpdateClientRates = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateClientRates>>, TError,{id: number;data: BodyType<StageRateInput[]>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateClientRates>>,
+        TError,
+        {id: number;data: BodyType<StageRateInput[]>},
+        TContext
+      > => {
+      return useMutation(getUpdateClientRatesMutationOptions(options));
+    }
 

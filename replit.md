@@ -1,10 +1,11 @@
-# [Project name]
+# LexLedger
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Full-stack law firm case management ledger with Neo-Brutalism UI, PKR currency, per-client stage rates, and print reports.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
+- `pnpm --filter @workspace/law-ledger run dev` — run the frontend (port 24412)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -16,29 +17,49 @@ _Replace the heading above with the project's name, and this line with one sente
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- Validation: Zod, `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
+- Frontend: React + Vite + TailwindCSS v4, wouter routing, TanStack Query
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/db/src/schema/` — DB schema (clients, cases, clientStageRates)
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (source of truth for API contracts)
+- `lib/api-client-react/src/generated/` — generated React Query hooks (from Orval)
+- `lib/api-zod/src/generated/` — generated Zod schemas (from Orval)
+- `artifacts/api-server/src/routes/` — Express route handlers
+- `artifacts/law-ledger/src/pages/` — React pages
+- `artifacts/law-ledger/src/index.css` — Neo-Brutalism theme variables and component classes
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Contract-first API: OpenAPI spec → Orval codegen → typed React Query hooks + Zod schemas. Always update the spec before implementing routes.
+- Stage rates are per-client (not global): stored in `client_stage_rates` table, editable from ClientDetail page via the RATES button.
+- PKR currency throughout: `formatCurrency()` in `lib/format.ts` uses `en-PK` locale with `PKR ` prefix.
+- NB theme uses CSS classes (`nb-card`, `nb-table`, `nb-btn-primary`, `nb-badge`) defined in `index.css`; no Tailwind utility sprawl for core NB styles.
+- Routes share a common prefix via the monorepo proxy (`/api`). Services handle their full base path.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Dashboard**: firm-wide stats (clients, cases, PKR totals, cases by stage, recent cases)
+- **Clients**: searchable client directory with add/delete
+- **Client Detail**: branded ledger header (dark banner with client name + balance), contact info editor, stage rates editor (per-stage PKR fees), full case table with totals
+- **Case Ledger**: full case table with inline editing, stage/client filters
+- **Reports**: firm summary + per-client printable case report
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Neo-Brutalism theme: `#F0E8D0` cream bg, `#0C0C0C` black, `#C94A00` burnt orange accent, hard box shadows, Space Grotesk / Bebas Neue / DM Mono fonts
+- PKR currency (Pakistani Rupee), no decimal places for round amounts
+- Responsive layout with hamburger menu on mobile
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After editing OpenAPI spec: always run `pnpm --filter @workspace/api-spec run codegen` before implementing routes.
+- After schema changes: run `pnpm --filter @workspace/db run push` (dev only).
+- `STAGE_COLORS` in `format.ts` returns a plain string of Tailwind classes; use directly in `className`.
+- Do NOT run `pnpm dev` at workspace root — restart individual workflows instead.
 
 ## Pointers
 
